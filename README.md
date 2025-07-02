@@ -94,7 +94,7 @@ This project is licensed under the [MIT License](LICENSE).
 ##  Author
 **Sana Gul**  
 🚀 Software Engineer | Java & Angular Enthusiast   
-🌐 [LinkedIn](https://www.linkedin.com/in/syedasanagul)
+🌐 [LinkedIn](https://www.linkedin.com/in/syeda-sana-gul)
 
 ---
 
