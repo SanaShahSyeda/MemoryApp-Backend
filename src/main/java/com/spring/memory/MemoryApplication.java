@@ -1,8 +1,13 @@
 package com.spring.memory;
 
 import com.spring.memory.entities.Board;
+import com.spring.memory.entities.Memory;
+import com.spring.memory.entities.Tag;
 import com.spring.memory.entities.User;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 public class MemoryApplication {
@@ -22,7 +27,25 @@ public class MemoryApplication {
 				.user(user) // set the owner
 				.build();
 
-		System.out.println(board.getTitle()+" "+ board.getUser());
+		// 3. Create Tag using Builder
+		Tag tag = Tag.builder()
+				.title("first")
+				.build();
+
+		Set<Tag> tags = new HashSet<>();
+		tags.add(tag);
+
+		// 4. Create Memory using Builder
+		Memory memory = Memory.builder()
+				.title("First Memory")
+				.content("This is my first memory in my first board")
+				.board(board)
+				.tags(tags)
+				.build();
+
+		System.out.println(user);
+		System.out.println(board);
+		System.out.println(memory);
 	}
 
 }
