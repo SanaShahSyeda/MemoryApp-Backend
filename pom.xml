@@ -90,6 +90,12 @@
 
 	<build>
 		<plugins>
+			<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-maven-plugin -->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.10.0</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
