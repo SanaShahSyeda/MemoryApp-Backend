@@ -34,6 +34,7 @@ See [docs/SETUP.md](docs/SETUP.md) for full instructions on prerequisites, datab
 
 Learn about:
 - [Flyway vs JPA Annotations](docs/ANNOTATION_GUIDE.md)
+- [JPA Internals: Fetching, Transactional, EntityManager](docs/JPA_CONCEPTS.md)
 
 ---
 
