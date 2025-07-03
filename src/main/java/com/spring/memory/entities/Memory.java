@@ -7,6 +7,8 @@ import com.spring.memory.enumeration.MemoryStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -40,8 +42,10 @@ public class Memory {
     private String mediaUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "memory_status DEFAULT 'DRAFT'")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "status", columnDefinition = "memory_status")
     private MemoryStatus status = MemoryStatus.DRAFT;
+
 
     @Column(name = "created_at")
     private Instant createdAt;
