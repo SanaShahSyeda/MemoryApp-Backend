@@ -1,9 +1,6 @@
 package com.spring.memory;
 
-import com.spring.memory.entities.Board;
-import com.spring.memory.entities.Memory;
-import com.spring.memory.entities.Tag;
-import com.spring.memory.entities.User;
+import com.spring.memory.entities.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.HashSet;
@@ -43,9 +40,18 @@ public class MemoryApplication {
 				.tags(tags)
 				.build();
 
+		// 5. Create Notification
+
+		Notification notification = Notification.builder()
+						.message("First notification")
+				        .memory(memory)
+				        .user(user)
+				        .build();
+
 		System.out.println(user);
 		System.out.println(board);
 		System.out.println(memory);
+		System.out.println(notification);
 	}
 
 }
