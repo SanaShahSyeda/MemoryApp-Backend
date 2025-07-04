@@ -13,6 +13,7 @@ A collection of errors encountered during backend development of the **MemoryApp
 - [TransientPropertyValueException](#-transientpropertyvalueexception-hibernate-entity-cascade)
 - [ConstraintViolationException](#-constraintviolationexception-validation-jpa-jakarta)
 - [InvalidDataAccessResourceUsageException](#-invaliddataaccessresourceusageexception-postgresqlenum-hibernate6-enumerated)
+- [FlywayException](#-flywayexception--flywaycleandisabled-spring-flyway-maven)
 
 ---
 
@@ -215,7 +216,7 @@ The user with ID `1` does not exist in the database, and `orElseThrow()` was cal
 
 ### Solution
 
-- Checked and the user doesn't exists in the database
+- Checked and the user doesn't exist in the database
 - Provide a meaningful fallback or custom exception[not applied yet]
 
 ```java
@@ -349,3 +350,42 @@ private MemoryStatus status;
 JPA Enum Mapping, PostgreSQL custom enum types, Hibernate 6 type system, `@JdbcType`, `@Enumerated`
 
 ---
+## 🐞 FlywayException — flyway.cleanDisabled [Spring] [Flyway] [Maven]
+
+### Error Message
+
+```bash
+[ERROR] Failed to execute goal org.flywaydb:flyway-maven-plugin:11.10.0:clean (default-cli) on project memory: 
+org.flywaydb.core.api.FlywayException: Unable to execute clean as it has been disabled with the 'flyway.cleanDisabled' property.
+```
+
+### Cause
+
+Spring Boot and Flyway **disable the `flyway:clean` operation by default** because it is a destructive operation—it drops the entire schema (all tables, views, etc.).
+
+### Solution
+
+Explicitly enabled Flyway's `clean` command by modifying the Flyway Maven plugin configuration in `pom.xml`:
+
+```xml
+<plugin>
+  <groupId>org.flywaydb</groupId>
+  <artifactId>flyway-maven-plugin</artifactId>
+  <version>11.10.0</version>
+  <configuration>
+    <url>jdbc:postgresql://localhost:5432/memory_app</url>
+    <user>postgresql_username</user>
+    <password>postgresql_password</password>
+    <cleanDisabled>false</cleanDisabled>
+  </configuration>
+</plugin>
+```
+
+> **Note:**  
+> Be extremely cautious with `flyway:clean`:
+> - It **drops all schema objects** (tables, views, sequences, etc.)
+> - Only use in **local/dev environments**
+
+### Related Concepts
+
+Flyway Maven plugin, Spring Boot integration with Flyway, `cleanDisabled` safeguard
