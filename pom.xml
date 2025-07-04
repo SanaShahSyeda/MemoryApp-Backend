@@ -95,6 +95,12 @@
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
 				<version>11.10.0</version>
+				<configuration>
+					<url>jdbc:postgresql://localhost:5432/memory_app</url>
+					<user>postgres</user>
+					<password>1234</password>
+					<cleanDisabled>false</cleanDisabled>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
