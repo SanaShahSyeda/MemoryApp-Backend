@@ -93,7 +93,7 @@ Lombok's annotations, annotation processing, Builder design pattern.
 
 ```java
 "C:\Program Files\Java\jdk-21\bin\java.exe"
-My First Board com.spring.memory.entities.User@710726a3
+My First Board com.spring.memory.entity.User@710726a3
 ```
 
 ### Cause
@@ -161,7 +161,7 @@ public class UserService {
 ```java
 Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException 
 Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: 
-No qualifying bean of type 'com.spring.memory.services.UserService' available
+No qualifying bean of type 'com.spring.memory.service.UserService' available
 ```
 
 ### Cause
@@ -241,7 +241,7 @@ Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
 Caused by: org.springframework.dao.InvalidDataAccessApiUsageException: 
 org.hibernate.TransientPropertyValueException: Not-null property references a transient value - 
 transient instance must be saved before current operation: 
-com.spring.memory.entities.Memory.board -> com.spring.memory.entities.Board
+com.spring.memory.entity.Memory.board -> com.spring.memory.entity.Board
 ```
 
 ### Cause
@@ -273,7 +273,7 @@ Hibernate entity states, transient references, JPA relationships
 ```bash
 Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
 Caused by: jakarta.validation.ConstraintViolationException: 
-Validation failed for classes [com.spring.memory.entities.Board] during persist time 
+Validation failed for classes [com.spring.memory.entity.Board] during persist time 
 for groups [jakarta.validation.groups.Default, ]
 ```
 
