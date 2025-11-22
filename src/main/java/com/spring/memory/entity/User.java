@@ -1,4 +1,4 @@
-package com.spring.memory.entities;
+package com.spring.memory.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
