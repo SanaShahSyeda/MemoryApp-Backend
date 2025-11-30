@@ -94,6 +94,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
         }
 
+        // MethodArgumentNotValid
         @Override
         protected ResponseEntity<Object> handleMethodArgumentNotValid(
                         MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status,
@@ -120,6 +121,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
         }
 
+        // ImageUploadFailure
+        @ExceptionHandler({ CloudinaryUploadImageException.class })
+        public ResponseEntity<ErrorResponseDTO> handleCloudinaryImageException(Exception ex, HttpServletRequest req) {
+                ErrorResponseDTO err = ErrorResponseDTO.builder()
+                                .timestamp(Instant.now())
+                                .status(HttpStatus.BAD_GATEWAY.value())
+                                .title("Image Upload Failure")
+                                .detail(ex.getMessage())
+                                .instance(req.getRequestURI())
+                                .build();
+
+                return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(err);
+        }
+
         // 500 - Internal Server Error (fallback)
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception ex, HttpServletRequest req) {
@@ -133,5 +148,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
         }
-
 }
