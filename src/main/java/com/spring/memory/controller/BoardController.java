@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/boards")
 public class BoardController {
+    // Board endpoints controller (no-op comment to create separate commit)
     private final BoardService boardService;
 
     public BoardController(BoardService boardService) {
