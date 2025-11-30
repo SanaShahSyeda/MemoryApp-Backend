@@ -2,7 +2,7 @@ package com.spring.memory.service;
 
 import com.spring.memory.entity.RefreshToken;
 import com.spring.memory.entity.User;
-import com.spring.memory.exception.BadRequestException;
+import com.spring.memory.exception.InvalidTokenException;
 import com.spring.memory.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,7 +69,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.deleteById(token.getId());
-            throw new BadRequestException("Refresh token was expired. Please make a new signin request");
+            throw new InvalidTokenException("Refresh token was expired. Please make a new signin request");
         }
         return token;
     }
