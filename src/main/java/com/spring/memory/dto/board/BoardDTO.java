@@ -1,13 +1,11 @@
 package com.spring.memory.dto.board;
 
 import com.spring.memory.dto.user.UserDTO;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import java.time.Instant;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class BoardDTO {
     private final Integer id;

@@ -12,7 +12,6 @@ import java.time.Instant;
 
 @Component
 public class BoardMapper {
-
     public BoardDTO toDto(Board b) {
         if (b == null)
             return null;
@@ -27,14 +26,15 @@ public class BoardMapper {
                     user.getUpdatedAt());
         }
 
-        return new BoardDTO(
-                b.getId(),
-                b.getTitle(),
-                b.getDescription(),
-                b.getCoverPhoto(),
-                b.getCreatedAt(),
-                b.getUpdatedAt(),
-                userDto);
+        return BoardDTO.builder()
+                .id(b.getId())
+                .title(b.getTitle())
+                .description(b.getDescription())
+                .coverPhoto(b.getCoverPhoto())
+                .createdAt(b.getCreatedAt())
+                .updatedAt(b.getUpdatedAt())
+                .userDto(userDto)
+                .build();
     }
 
     public Board toEntity(CreateBoardDTO dto, User user) {
@@ -45,6 +45,19 @@ public class BoardMapper {
                 .description(dto.getDescription())
                 .coverPhoto(null)
                 .user(user)
+                .build();
+    }
+
+    public Board toEntity(BoardDTO dto) {
+        if (dto == null)
+            return null;
+        return Board.builder()
+                .id(dto.getId())
+                .title(dto.getTitle())
+                .description(dto.getDescription())
+                .coverPhoto(dto.getCoverPhoto())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
                 .build();
     }
 
@@ -65,11 +78,6 @@ public class BoardMapper {
         } else if (req.getCoverPhotoUrl() != null) {
             board.setCoverPhoto(req.getCoverPhotoUrl());
         }
-
-
-
-
         board.setUpdatedAt(Instant.now());
     }
-
 }

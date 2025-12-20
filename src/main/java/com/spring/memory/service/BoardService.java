@@ -71,9 +71,7 @@ public class BoardService {
             String url = cloudinaryService.upload(newFile).getUrl();
             req.setCoverPhotoUrl(url);
         }
-
         boardMapper.patchEntity(board, req);
-
         Board saved = boardRepository.save(board);
         return boardMapper.toDto(saved);
     }
@@ -84,8 +82,9 @@ public class BoardService {
                 .orElseThrow(() -> new BadRequestException("Board not found or not owned by user"));
 
         BoardDTO dto = boardMapper.toDto(board);
+        String coverPhotoUrl = FetchCloudinaryPublicId.extractPublicId(board.getCoverPhoto());
+        cloudinaryService.delete(coverPhotoUrl);
         boardRepository.delete(board);
-
         return dto;
     }
 
@@ -95,6 +94,7 @@ public class BoardService {
 
         return boardMapper.toDto(board);
     }
+    
     public Page<BoardDTO> getAllBoards(Integer userId, Integer page, Integer limit) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Board> boardPage = boardRepository.findAllByUserId(userId, pageable);

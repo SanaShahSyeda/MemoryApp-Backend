@@ -43,5 +43,6 @@ public class Board {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 }
