@@ -120,3 +120,38 @@ For a visual breakdown of entity states:
 | **EntityManager** | Low-level control over persistence context        |
 
 ---
+
+## 4️⃣ Every JPA entity MUST have a no-argument constructor (at least protected).
+
+JPA mandates that every entity must have a public or protected no-argument constructor.
+This is not optional; it is a JPA specification rule.
+
+### 🔍 Why JPA Needs a No-Arg Constructor
+Hibernate does not instantiate entities using your constructors. Instead, it:
+- Creates an empty instance using reflection
+- Injects field values directly from the database
+- Manages the entity inside the persistence context
+
+Without a no-arg constructor, Hibernate cannot instantiate the entity, resulting in errors during startup (IDE validation) or at runtime.
+
+```java
+@Entity
+public class Board {
+    private String title;
+
+    protected Board() {
+        // Required by JPA
+    }
+    public Board(String title) {
+        this.title = title;
+    }
+}
+
+```
+
+Lombok’s @NoArgsConstructor simply generates this constructor for you.
+Removing it from an @Entity violates JPA rules and is correctly flagged by IDEs before runtime.
+
+> 🧠 Key Takeaway
+JPA entities are not regular Java objects.
+The framework controls their lifecycle and that lifecycle starts with a no-arg constructor.
