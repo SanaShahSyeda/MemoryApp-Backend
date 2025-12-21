@@ -14,6 +14,7 @@ A collection of errors encountered during backend development of the **MemoryApp
 - [ConstraintViolationException](#-constraintviolationexception-validation-jpa-jakarta)
 - [InvalidDataAccessResourceUsageException](#-invaliddataaccessresourceusageexception-postgresqlenum-hibernate6-enumerated)
 - [FlywayException](#-flywayexception--flywaycleandisabled-spring-flyway-maven)
+- [InvalidDataAccessResource](#-invaliddataaccessresourceusageexception--board-vs-integer-comparison)
 
 ---
 
@@ -67,6 +68,7 @@ The `@Builder` annotation was not working because the Lombok dependency version 
 ```
 
 - Enabled annotation processing in IntelliJ IDEA:
+
   - Navigate to `File > Settings > Build, Execution, Deployment > Compiler > Annotation Processors`
   - Check: "Enable annotation processing"
 
@@ -129,7 +131,6 @@ Lombok's annotations, `Object.toString()` override behavior.
 
 ---
 
-
 ## 🐞 NoSuchBeanDefinitionException [Spring] [Beans] [Annotation]
 
 ### Code
@@ -159,8 +160,8 @@ public class UserService {
 ### Error Message
 
 ```java
-Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException 
-Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: 
+Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException:
 No qualifying bean of type 'com.spring.memory.service.UserService' available
 ```
 
@@ -238,9 +239,9 @@ userRepository.findById(1)
 
 ```bash
 Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
-Caused by: org.springframework.dao.InvalidDataAccessApiUsageException: 
-org.hibernate.TransientPropertyValueException: Not-null property references a transient value - 
-transient instance must be saved before current operation: 
+Caused by: org.springframework.dao.InvalidDataAccessApiUsageException:
+org.hibernate.TransientPropertyValueException: Not-null property references a transient value -
+transient instance must be saved before current operation:
 com.spring.memory.entity.Memory.board -> com.spring.memory.entity.Board
 ```
 
@@ -272,8 +273,8 @@ Hibernate entity states, transient references, JPA relationships
 
 ```bash
 Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
-Caused by: jakarta.validation.ConstraintViolationException: 
-Validation failed for classes [com.spring.memory.entity.Board] during persist time 
+Caused by: jakarta.validation.ConstraintViolationException:
+Validation failed for classes [com.spring.memory.entity.Board] during persist time
 for groups [jakarta.validation.groups.Default, ]
 ```
 
@@ -318,7 +319,7 @@ Bean Validation (JSR 380 / Jakarta Validation), `@NotNull`, `@Size`, `@Valid`, e
 
 ```bash
 Exception in thread "restartedMain" java.lang.reflect.InvocationTargetException
-Caused by: org.springframework.dao.InvalidDataAccessResourceUsageException: could not execute statement 
+Caused by: org.springframework.dao.InvalidDataAccessResourceUsageException: could not execute statement
 [ERROR: column "status" is of type memory_status but expression is of type character varying
   Hint: You will need to rewrite or cast the expression.
 ```
@@ -350,12 +351,13 @@ private MemoryStatus status;
 JPA Enum Mapping, PostgreSQL custom enum types, Hibernate 6 type system, `@JdbcType`, `@Enumerated`
 
 ---
+
 ## 🐞 FlywayException — flyway.cleanDisabled [Spring] [Flyway] [Maven]
 
 ### Error Message
 
 ```bash
-[ERROR] Failed to execute goal org.flywaydb:flyway-maven-plugin:11.10.0:clean (default-cli) on project memory: 
+[ERROR] Failed to execute goal org.flywaydb:flyway-maven-plugin:11.10.0:clean (default-cli) on project memory:
 org.flywaydb.core.api.FlywayException: Unable to execute clean as it has been disabled with the 'flyway.cleanDisabled' property.
 ```
 
@@ -383,9 +385,61 @@ Explicitly enabled Flyway's `clean` command by modifying the Flyway Maven plugin
 
 > **Note:**  
 > Be extremely cautious with `flyway:clean`:
+>
 > - It **drops all schema objects** (tables, views, sequences, etc.)
 > - Only use in **local/dev environments**
 
 ### Related Concepts
 
 Flyway Maven plugin, Spring Boot integration with Flyway, `cleanDisabled` safeguard
+
+---
+
+## 🐞 InvalidDataAccessResourceUsageException — Board vs Integer comparison
+
+### Observed response
+
+```
+{
+    "type": "about:blank",
+    "title": "Unsupported Media Type",
+    "status": 415,
+    "detail": "Content-Type 'multipart/form-data;boundary=--------------------------664780261817957559467651;charset=UTF-8' is not supported.",
+    "instance": "/api/v1/memories/update/26/20"
+}
+```
+
+### Where it happened
+
+- Endpoint: `PATCH /api/v1/memories/update/{boardId}/{memoryId}`
+- Controller expected a JSON body mapped with `@RequestBody UpdateMemoryDTO`
+- Client sent a `multipart/form-data` request (typically used when uploading files or using `@ModelAttribute`)
+
+### Explanation
+
+Spring rejected the request with HTTP 415 because the controller method did not declare support for `multipart/form-data`. The server-side handler expected JSON (`application/json`) but the client sent multipart form data (often produced by HTML forms or Postman when files are attached). When a controller uses `@RequestBody` Spring only attempts to deserialize the request body as the declared content type (JSON by default) and will not process multipart content unless the handler consumes it.
+
+### Cause
+
+- Sending `multipart/form-data` to an endpoint that expects JSON (`@RequestBody`) triggers 415.
+- Using `@ModelAttribute` or posting forms with files requires the controller to accept `multipart/form-data` (via `@ModelAttribute` or `@RequestPart` plus `consumes = MediaType.MULTIPART_FORM_DATA_VALUE`).
+
+### Solution
+
+1. Accept multipart/form-data on the server (support file uploads)
+
+- Change controller to consume multipart and use `@ModelAttribute` for a form-backed DTO or use `@RequestPart` for a JSON part plus files.
+- Example controller signature (form-based):
+
+```java
+@PatchMapping(value = "update/{boardId}/{memoryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<MemoryDTO> updateMemory(
+                @PathVariable Integer boardId,
+                @PathVariable Integer memoryId,
+                @AuthenticationPrincipal CustomUserDetails user,
+                @ModelAttribute UpdateMemoryDTO form) {
+}
+```
+
+Related Concepts
+@ModelAttribute, multipart/form-data,
