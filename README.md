@@ -69,6 +69,7 @@ Ongoing list of common issues and their resolutions:
   - `POST /api/v1/auth/register` : Register a new user (body: `RegisterDTO`).
   - `POST /api/v1/auth/login` : Login and receive access + refresh tokens (body: `LoginDTO`).
   - `POST /api/v1/auth/refresh` : Exchange a refresh token for a new access + refresh pair (body: `RefreshTokenRequestDTO`).
+  - `POST /api/v1/auth/logout` : Logout the currently authenticated user (authenticated). Returns `LogoutResponseDTO` (fields: `message`, `user`).
 
 - **Boards (`/api/v1/boards`):**
 
@@ -87,11 +88,20 @@ Ongoing list of common issues and their resolutions:
   - `DELETE /api/v1/memories/delete/{id}` : Delete a memory (authenticated).
 
 - **Tags (`/api/v1/tags`):**
+
   - `POST /api/v1/tags/create` : Create a tag (body: `CreateTagDTO`).
   - `PUT /api/v1/tags/update/{id}` : Update a tag (body: `UpdateTagDTO`, authenticated).
   - `GET /api/v1/tags/{id}` : Get a tag by id(authenticated).
   - `GET /api/v1/tags/all` : List all tags(authenticated).
   - `DELETE /api/v1/tags/delete/{id}` : Delete a tag(authenticated).
+
+- **Users (`/api/v1/users`):**
+  - `PUT /api/v1/users/profile` : Update the authenticated user's profile (consumes `multipart/form-data`, authenticated).
+    - Form fields:
+      - `avatar` (file, optional): New avatar image to upload.
+      - `removeAvatar` (boolean, optional): Set to `true` to remove existing avatar.
+    - Returns: `UserDTO` (fields: `email`, `avatarUrl`, `createdAt`, `updatedAt`).
+    - Notes: Use `Content-Type: multipart/form-data` and include the JWT in the `Authorization: Bearer <token>` header.
 
 Notes:
 
