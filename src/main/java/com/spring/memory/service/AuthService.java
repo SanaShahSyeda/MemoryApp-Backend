@@ -1,9 +1,6 @@
 package com.spring.memory.service;
 
-import com.spring.memory.dto.user.LoginDTO;
-import com.spring.memory.dto.user.LoginResponseDTO;
-import com.spring.memory.dto.user.RegisterDTO;
-import com.spring.memory.dto.user.UserDTO;
+import com.spring.memory.dto.user.*;
 import com.spring.memory.entity.User;
 import com.spring.memory.exception.BadRequestException;
 import com.spring.memory.exception.InvalidTokenException;
@@ -104,4 +101,16 @@ public class AuthService {
                                 .user(userDTO)
                                 .build();
         }
+
+        public LogoutResponseDTO logout(Integer userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        refreshTokenService.deleteByUser(user);
+        LogoutResponseDTO res = new LogoutResponseDTO();
+        res.setMessage("Logged out successfully");
+        res.setUser(user);
+        return res;
+    }
 }

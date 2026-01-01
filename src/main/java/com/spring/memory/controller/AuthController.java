@@ -1,13 +1,11 @@
 package com.spring.memory.controller;
 
-import com.spring.memory.dto.user.LoginResponseDTO;
-import com.spring.memory.dto.user.UserDTO;
-import com.spring.memory.dto.user.LoginDTO;
-import com.spring.memory.dto.user.RegisterDTO;
-import com.spring.memory.dto.user.RefreshTokenRequestDTO;
+import com.spring.memory.dto.user.*;
+import com.spring.memory.entity.CustomUserDetails;
 import com.spring.memory.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,4 +37,13 @@ public class AuthController {
         LoginResponseDTO dto = authService.refreshToken(req.getRefreshToken());
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponseDTO> logout(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        LogoutResponseDTO dto = authService.logout(user.getId());
+        return ResponseEntity.ok(dto);
+    }
+
 }
