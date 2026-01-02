@@ -18,9 +18,11 @@ sequenceDiagram
 
     SecurityFilter->>SecurityFilter: Extract JWT from header
 
-    alt
-    else Token present
-        SecurityFilter->>TokenProvider: validateToken(jwt)
+    SecurityFilter->>TokenProvider: validateToken(jwt)
+
+    alt Token missing or invalid
+        SecurityFilter-->>Client: 401 Unauthorized
+    else Token valid
         TokenProvider-->>SecurityFilter: valid
 
         SecurityFilter->>TokenProvider: getUsernameFromToken(jwt)
