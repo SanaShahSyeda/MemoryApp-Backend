@@ -6,9 +6,14 @@ A personal project to **keep track of memories** and **practice Spring Boot** de
 
 ## Overview
 
-The **MemoryApp** is a backend system for storing, organizing, and retrieving personal memories. It includes[not implemented] user authentication, memory creation and tagging.
+MemoryApp allows users to store and organize personal memories using:
+- Boards (grouping memories)
+- Tags (categorization)
+- Media attachments
+- Secure authentication
 
-It is built as a learning project to deepen understanding of Spring Boot internals and JPA entity relationships.
+> [!Note]
+> Notification support is planned but not yet implemented.
 
 ---
 
@@ -24,62 +29,114 @@ It is built as a learning project to deepen understanding of Spring Boot interna
 
 ---
 
-## 📁 Project Setup
+## Architectural Decisions
 
-See [docs/SETUP.md](docs/SETUP.md) for full instructions on prerequisites, database setup, and running the app.
+- Controllers are **thin** and request-focused
+- Business logic lives in the **service layer**
+- Repositories expose **minimal query methods**
+- DTOs prevent **entity leakage**
+- Transactions are handled explicitly
+- Flyway owns schema evolution
 
-**Auth** (`/api/v1/auth`)
+---
 
-| Method | Path                    | Description                                                                               | Auth |
-| ------ | ----------------------- | ----------------------------------------------------------------------------------------- | ---- |
-| POST   | `/api/v1/auth/register` | Register a new user (body: `RegisterDTO`)                                                 | No   |
-| POST   | `/api/v1/auth/login`    | Login and receive access + refresh tokens (body: `LoginDTO`)                              | No   |
-| POST   | `/api/v1/auth/refresh`  | Exchange a refresh token for a new access + refresh pair (body: `RefreshTokenRequestDTO`) | No   |
-| POST   | `/api/v1/auth/logout`   | Logout the currently authenticated user; returns `LogoutResponseDTO` (`message`, `user`)  | Yes  |
+## Security Model
 
-**Boards** (`/api/v1/boards`)
+- Stateless JWT-based authentication
+- Short-lived **access tokens**
+- Refresh tokens stored server-side
+- Logout implemented via **refresh token invalidation**
+- Protected endpoints enforced through Spring Security filters
 
-| Method | Path                         | Description                            | Auth | Notes                  |
-| ------ | ---------------------------- | -------------------------------------- | ---- | ---------------------- |
-| POST   | `/api/v1/boards/create`      | Create a board                         | Yes  | `multipart/form-data`  |
-| PATCH  | `/api/v1/boards/update/{id}` | Update a board                         | Yes  | `multipart/form-data`  |
-| DELETE | `/api/v1/boards/delete/{id}` | Delete a board                         | Yes  | -                      |
-| GET    | `/api/v1/boards/all`         | List boards for the authenticated user | Yes  | Query: `page`, `limit` |
-| GET    | `/api/v1/boards/{id}`        | Get a board by id                      | Yes  | -                      |
+Authentication flows are documented with sequence diagrams.
 
-**Memories** (`/api/v1/memories`)
+---
 
-| Method | Path                                           | Description                | Auth | Notes                                    |
-| ------ | ---------------------------------------------- | -------------------------- | ---- | ---------------------------------------- |
-| POST   | `/api/v1/memories/create/{boardId}`            | Create a memory on a board | Yes  | `multipart/form-data` (use `mediaFiles`) |
-| PATCH  | `/api/v1/memories/update/{boardId}/{memoryId}` | Update a memory            | Yes  | `multipart/form-data`                    |
-| GET    | `/api/v1/memories/board/all/{id}`              | List memories of a board   | Yes  | Query: `page`, `limit`                   |
-| GET    | `/api/v1/memories/{id}`                        | Get a memory by id         | Yes  | -                                        |
-| DELETE | `/api/v1/memories/delete/{id}`                 | Delete a memory            | Yes  | -                                        |
+## Database Strategy
 
-**Tags** (`/api/v1/tags`)
+- PostgreSQL as the primary datastore
+- Flyway for controlled, versioned schema migrations
+- No automatic schema generation in production
+- Explicit migration scripts under `db/migration`
 
-| Method | Path                       | Description                         | Auth | Notes |
-| ------ | -------------------------- | ----------------------------------- | ---- | ----- |
-| POST   | `/api/v1/tags/create`      | Create a tag (body: `CreateTagDTO`) | No   | Body: `CreateTagDTO` |
-| PUT    | `/api/v1/tags/update/{id}` | Update a tag (body: `UpdateTagDTO`) | Yes  | Body: `UpdateTagDTO` |
-| GET    | `/api/v1/tags/{id}`        | Get a tag by id                     | Yes  | - |
-| GET    | `/api/v1/tags/all`         | List all tags                       | Yes  | - |
-| DELETE | `/api/v1/tags/delete/{id}` | Delete a tag                        | Yes  | - |
+---
 
-**Users** (`/api/v1/users`)
+## Quick Start
 
-| Method | Path                    | Description                             | Auth | Notes                                                                                                                                                                                                        |
-| ------ | ----------------------- | --------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| PUT    | `/api/v1/users/profile` | Update the authenticated user's profile | Yes  | `multipart/form-data`; form fields: `avatar` (file, optional), `removeAvatar` (boolean). Returns `UserDTO` (`email`, `avatarUrl`, `createdAt`, `updatedAt`). Include `Authorization: Bearer <token>` header. |
+1. For getting started (see `docs/SETUP.md` for details).
+2. Update `src/main/resources/application.properties` with your DB credentials (see Configuration below).
+3. Run the application locally
 
-Notes:
+---
 
-- Endpoints marked as **authenticated** require a valid JWT in the `Authorization: Bearer <token>` header. The security filter validates the token and sets the authenticated principal (`CustomUserDetails`).
-- For multipart endpoints (board/memory create & update) use `Content-Type: multipart/form-data` and send media files in the `mediaFiles` field.
-- See the `src/main/java/com/spring/memory/controller` folder for controller-level DTOs and method signatures.
+## Configuration
 
-This project is licensed under the [MIT License](LICENSE).
+Set the following essential properties in `src/main/resources/application.properties` or via environment variables:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/memory_app
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+
+# JWT (example keys - replace in production)
+app.jwt.secret=replace-with-your-secret
+app.jwt.expirationMs=3600000
+
+# Flyway
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+```
+
+## Running (Dev)
+
+- Run via Maven wrapper:
+
+```powershell
+./mvnw spring-boot:run
+```
+
+- Run tests:
+
+```powershell
+./mvnw test
+```
+
+- Run Flyway migrations manually:
+
+```powershell
+./mvnw flyway:migrate
+```
+
+---
+
+## API Summary
+
+Core endpoints include authentication, boards, memories, tags, and user profile management.
+
+- **API Reference**: `docs/API_REFERENCE.md`; detailed endpoint tables and notes (moved from README).
+
+---
+
+## Documentation
+
+- **Setup**: Step-by-step local setup and prerequisites; [SETUP.md](`docs/SETUP.md`)
+- **Annotation Guide**: Flyway vs JPA annotations and best practices; [ANNOTATION_GUIDE](`docs/ANNOTATION_GUIDE.md`)
+- **JPA Concepts**: Fetch strategies, `@Transactional`, and `EntityManager` notes; [JPA_CONCEPTS](`docs/JPA_CONCEPTS.md`)
+- **Performance & Best Practices**: Performance tips and common pitfalls; [PERFORMANCE_&_BEST_PRACTICES_GUIDE](`docs/PERFORMANCE_&_BEST_PRACTICES_GUIDE.md`)
+- **Error Log / Troubleshooting**: Collected errors, causes, and solutions; [ERROR_LOG](`docs/ERROR_LOG.md`)
+- **Auth Diagrams**: Sequence diagrams showing authentication flows; [auth](`docs/diagrams/auth.md`)
+
+---
+
+## Architecture
+
+Main packages: `com.spring.memory` → `controller`, `service`, `repository`, `entity`, `dto`, `security`, `configuration`.
+
+Database migrations are in `src/main/resources/db/migration` (Flyway).
+
+---
+
+> This project is licensed under the [MIT License](LICENSE).
 
 ---
 
