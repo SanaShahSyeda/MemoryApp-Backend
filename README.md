@@ -59,13 +59,13 @@ See [docs/SETUP.md](docs/SETUP.md) for full instructions on prerequisites, datab
 
 **Tags** (`/api/v1/tags`)
 
-| Method | Path                       | Description                         | Auth |
-| ------ | -------------------------- | ----------------------------------- | ---- |
-| POST   | `/api/v1/tags/create`      | Create a tag (body: `CreateTagDTO`) | Yes  |
-| PUT    | `/api/v1/tags/update/{id}` | Update a tag (body: `UpdateTagDTO`) | Yes  |
-| GET    | `/api/v1/tags/{id}`        | Get a tag by id                     | Yes  |
-| GET    | `/api/v1/tags/all`         | List all tags                       | Yes  |
-| DELETE | `/api/v1/tags/delete/{id}` | Delete a tag                        | Yes  |
+| Method | Path                       | Description                         | Auth | Notes |
+| ------ | -------------------------- | ----------------------------------- | ---- | ----- |
+| POST   | `/api/v1/tags/create`      | Create a tag (body: `CreateTagDTO`) | No   | Body: `CreateTagDTO` |
+| PUT    | `/api/v1/tags/update/{id}` | Update a tag (body: `UpdateTagDTO`) | Yes  | Body: `UpdateTagDTO` |
+| GET    | `/api/v1/tags/{id}`        | Get a tag by id                     | Yes  | - |
+| GET    | `/api/v1/tags/all`         | List all tags                       | Yes  | - |
+| DELETE | `/api/v1/tags/delete/{id}` | Delete a tag                        | Yes  | - |
 
 **Users** (`/api/v1/users`)
 
