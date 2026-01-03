@@ -2,7 +2,18 @@
 
 This file contains the main HTTP endpoints exposed by the MemoryApp backend. It was moved out of the top-level `README.md` to keep the README concise.
 
+## Overview
+
+All endpoints are prefixed with `/api/v1`.
+
+- Authentication uses JWT (Bearer token)
+- Protected endpoints require: `Authorization: Bearer <access_token>`
+- Pagination parameters follow `page` and `limit`
+- Request and response bodies are JSON unless stated otherwise
+
+
 **Auth** (`/api/v1/auth`)
+
 
 | Method | Path                    | Description                                                                               | Auth |
 | ------ | ----------------------- | ----------------------------------------------------------------------------------------- | ---- |
@@ -10,6 +21,11 @@ This file contains the main HTTP endpoints exposed by the MemoryApp backend. It 
 | POST   | `/api/v1/auth/login`    | Login and receive access + refresh tokens (body: `LoginDTO`)                              | No   |
 | POST   | `/api/v1/auth/refresh`  | Exchange a refresh token for a new access + refresh pair (body: `RefreshTokenRequestDTO`) | No   |
 | POST   | `/api/v1/auth/logout`   | Logout the currently authenticated user; returns `LogoutResponseDTO` (`message`, `user`)  | Yes  |
+
+
+> [!Note]
+> Access tokens are short-lived. Logout invalidates the refresh token server-side.
+
 
 **Boards** (`/api/v1/boards`)
 
@@ -34,8 +50,8 @@ This file contains the main HTTP endpoints exposed by the MemoryApp backend. It 
 **Tags** (`/api/v1/tags`)
 
 | Method | Path                       | Description                         | Auth | Notes                |
-| ------ | -------------------------- | ----------------------------------- | ---- | -------------------- |
-| POST   | `/api/v1/tags/create`      | Create a tag (body: `CreateTagDTO`) | No   | Body: `CreateTagDTO` |
+| ------ | -------------------------- | ----------------------------------- |------| -------------------- |
+| POST   | `/api/v1/tags/create`      | Create a tag (body: `CreateTagDTO`) | Yes  | Body: `CreateTagDTO` |
 | PUT    | `/api/v1/tags/update/{id}` | Update a tag (body: `UpdateTagDTO`) | Yes  | Body: `UpdateTagDTO` |
 | GET    | `/api/v1/tags/{id}`        | Get a tag by id                     | Yes  | -                    |
 | GET    | `/api/v1/tags/all`         | List all tags                       | Yes  | -                    |
@@ -46,3 +62,16 @@ This file contains the main HTTP endpoints exposed by the MemoryApp backend. It 
 | Method | Path                    | Description                             | Auth | Notes                                                                                                                                                                                                        |
 | ------ | ----------------------- | --------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | PUT    | `/api/v1/users/profile` | Update the authenticated user's profile | Yes  | `multipart/form-data`; form fields: `avatar` (file, optional), `removeAvatar` (boolean). Returns `UserDTO` (`email`, `avatarUrl`, `createdAt`, `updatedAt`). Include `Authorization: Bearer <token>` header. |
+
+
+> [!Note]
+> Some endpoints use action-based paths (`/create`, `/update`)
+> instead of pure REST-style routes. This reflects an early
+> design choice and may be refactored in future iterations.
+
+
+## Postman Collection
+
+A ready-to-use Postman collection is available with example requests and responses:
+
+[🔗 Memory App Collection](https://www.postman.com/syedasanashah/workspace/my-workspace/collection/29239196-8c01f643-fe4b-4a8f-bfbf-cf3a040f1a10?action=share&creator=29239196)
